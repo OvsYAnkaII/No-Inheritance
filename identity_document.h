@@ -10,7 +10,7 @@ public:
     IdentityDocument()
         : unique_id_(++unique_id_count_) 
     {
-        // this указывает на начало объекта IdentityDocument.
+        // this указывает на начало объекта.
         // Первое поле объекта — v_table_ptr_ (указатель на VTable).
         // Чтобы записать vtable, нужно получить доступ к первому полю объекта.
         *static_cast<const VTable**>(static_cast<void*>(this)) = &vtable_obj;
@@ -54,6 +54,21 @@ public:
     static void IdentityDocumentDelete(void* Object) {
         auto IdentityDocumentObjectPtr = static_cast<IdentityDocument*>(Object);
         delete(IdentityDocumentObjectPtr);
+    }
+
+    void* operator new(size_t size) {
+        std::cout << "IdentityDocument::operator new(size: " << size << ")" << std::endl;
+        return ::operator new(size);
+    }
+
+    void operator delete(void* ptr) noexcept {
+        std::cout << "IdentityDocument::operator delete()" << std::endl;
+        ::operator delete(ptr);
+    }
+
+    void operator delete(void* ptr, size_t size) noexcept {
+        std::cout << "IdentityDocument::operator delete(size: " << size << ")" << std::endl;
+        ::operator delete(ptr);
     }
 
     struct VTable {

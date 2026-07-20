@@ -9,6 +9,9 @@ using namespace std::string_view_literals;
 class DrivingLicence {
 public:
     DrivingLicence() {
+        // this указывает на начало объекта, т.е. IdentityDocument.
+        // Первое поле объекта — v_table_ptr_ (указатель на VTable).
+        // Чтобы записать vtable, нужно получить доступ к первому полю объекта.
         *reinterpret_cast<const VTable**>(this) = &vtable_obj;
         std::cout << "DrivingLicence::Ctor()"sv << std::endl;
     }
@@ -29,6 +32,35 @@ public:
         std::cout << "DrivingLicence::PrintID() : "sv << base_document_.GetID() << std::endl;
     }
 
+    void Delete() {
+        DrivingLicenceDelete(this);
+    }
+
+    void* operator new(size_t size) {
+        std::cout << "DrivingLicence::operator new(size: " << size << ")" << std::endl;
+        return ::operator new(size);
+    }
+
+    void operator delete(void* ptr) noexcept {
+        std::cout << "DrivingLicence::operator delete()" << std::endl;
+        ::operator delete(ptr);
+    }
+
+     void operator delete(void* ptr, size_t size) noexcept {
+        std::cout << "DrivingLicence::operator delete(size: " << size << ")" << std::endl;
+        ::operator delete(ptr);
+    }
+
+    operator IdentityDocument() const {
+        return base_document_;
+    }
+
+    struct VTable {
+        void (*PrintID)(const void*);
+        void (*Delete)(void*);
+    };
+
+private:
     static void DrivingLicencePrintID(const void* Object) {
         const auto DrivingLicenceObjectPtr = static_cast<const DrivingLicence*>(Object);
         DrivingLicenceObjectPtr->PrintID();
@@ -39,20 +71,6 @@ public:
         delete DrivingLicenceObjectPtr;
     }
 
-      operator IdentityDocument() const {
-        return base_document_;
-    }
-
-    void Delete() {
-        DrivingLicenceDelete(this);
-    }
-
-    struct VTable {
-        void (*PrintID)(const void*);
-        void (*Delete)(void*);
-    };
-
-    private:
     IdentityDocument base_document_;
     static constexpr VTable vtable_obj {DrivingLicencePrintID, DrivingLicenceDelete};
 };

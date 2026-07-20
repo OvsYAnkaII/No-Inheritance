@@ -10,6 +10,9 @@ class Passport{
 public:
     Passport()
     {
+        // this указывает на начало объекта, т.е. IdentityDocument.
+        // Первое поле объекта — v_table_ptr_ (указатель на VTable).
+        // Чтобы записать vtable, нужно получить доступ к первому полю объекта.
         *static_cast<const VTable**>(static_cast<void*>(this)) = &vtable_obj;
         std::cout << "Passport::Ctor()"sv << std::endl;
     }
@@ -32,25 +35,34 @@ public:
                   << expiration_date_.tm_year + 1900 << std::endl;
     }
 
-    static void PassportPrintID(const void* Object){
-        const auto PassportObjectPtr = static_cast<const Passport*>(Object);
-        PassportObjectPtr->PrintID();
-    }
-
-    void PrintVisa(const std::string& country) const {
-        std::cout << "Passport::PrintVisa("sv << country << ") : "sv << base_document_.GetID() << std::endl;
-    }
-
-    static void PassportDelete(void* Object) {
-        auto PassportObjectPtr = static_cast<Passport*>(Object);
-        delete PassportObjectPtr;
+    void Delete() {
+        PassportDelete(this);
     }
 
     static void PrintUniqueIDCount() {
         IdentityDocument::PrintUniqueIDCount();
     }
 
-     operator IdentityDocument() const {
+    void PrintVisa(const std::string& country) const {
+        std::cout << "Passport::PrintVisa("sv << country << ") : "sv << base_document_.GetID() << std::endl;
+    }
+
+    void* operator new(size_t size) {
+        std::cout << "Passport::operator new(size: " << size << ")" << std::endl;
+        return ::operator new(size);
+    }
+
+    void operator delete(void* ptr) noexcept {
+        std::cout << "Passport::operator delete()" << std::endl;
+        ::operator delete(ptr);
+    }
+
+    void operator delete(void* ptr, size_t size) noexcept {
+        std::cout << "Passport::operator delete(size: " << size << ")" << std::endl;
+        ::operator delete(ptr);
+    }
+
+    operator IdentityDocument() const {
         return base_document_;
     }
 
@@ -59,15 +71,7 @@ public:
         void (*Delete)(void*);
     };
 
-    void Delete() {
-        PassportDelete(this);
-    }
-
 private:
-    IdentityDocument base_document_;
-    static constexpr VTable vtable_obj {PassportPrintID, PassportDelete};
-    const struct tm expiration_date_{GetExpirationDate()};
-
     static tm GetExpirationDate() {
         time_t t = time(nullptr);
         tm exp_date = *localtime(&t);
@@ -75,4 +79,18 @@ private:
         mktime(&exp_date);
         return exp_date;
     }
+
+    static void PassportDelete(void* Object) {
+        auto PassportObjectPtr = static_cast<Passport*>(Object);
+        delete PassportObjectPtr;
+    }
+
+    static void PassportPrintID(const void* Object){
+        const auto PassportObjectPtr = static_cast<const Passport*>(Object);
+        PassportObjectPtr->PrintID();
+    }
+
+    IdentityDocument base_document_;
+    static constexpr VTable vtable_obj {PassportPrintID, PassportDelete};
+    const tm expiration_date_{GetExpirationDate()};
 };

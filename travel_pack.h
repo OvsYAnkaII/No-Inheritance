@@ -11,6 +11,9 @@ public:
     TravelPack()
     : identity_doc1_(reinterpret_cast<IdentityDocument*>(new Passport()))
     , identity_doc2_(reinterpret_cast<IdentityDocument*>(new DrivingLicence())) {
+        // this указывает на начало объекта, т.е. IdentityDocument.
+        // Первое поле объекта — v_table_ptr_ (указатель на VTable).
+        // Чтобы записать vtable, нужно получить доступ к первому полю объекта.
         *reinterpret_cast<const VTable**>(this) = &vtable_obj;
         std::cout << "TravelPack::Ctor()"sv << std::endl;
     }
@@ -39,18 +42,41 @@ public:
         additional_dr_licence_.PrintID();
     }
 
+    void Delete() {
+        DeleteTravelPack(this);
+    }
+
+     void* operator new(size_t size) {
+        std::cout << "TravelPack::operator new(size: " << size << ")" << std::endl;
+        return ::operator new(size);
+    }
+
+     void operator delete(void* ptr) noexcept {
+        std::cout << "TravelPack::operator delete()" << std::endl;
+        ::operator delete(ptr);
+    }
+
+     void operator delete(void* ptr, size_t size) noexcept {
+        std::cout << "TravelPack::operator delete(size: " << size << ")" << std::endl;
+        ::operator delete(ptr);
+    }
+
     operator IdentityDocument() const {
         return base_document;
+    }
+
+    operator Passport() const {
+        return additional_pass_;
+    }
+
+    operator DrivingLicence() const {
+        return additional_dr_licence_;
     }
 
     struct VTable {
         void (*PrintID)(const void*);
         void (*Delete)(void*);
     };
-
-    void Delete() {
-        DeleteTravelPack(this);
-    }
 
 private:
     IdentityDocument base_document{};

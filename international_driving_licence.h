@@ -28,13 +28,29 @@ public:
         std::cout << std::endl;
     }
 
-      operator IdentityDocument() const {
+    void* operator new(size_t size) {
+        std::cout << "InternationalDrivingLicence::operator new(size: " << size << ")" << std::endl;
+        return ::operator new(size);
+    }
+
+    void operator delete(void* ptr) noexcept {
+        std::cout << "InternationalDrivingLicence::operator delete()" << std::endl;
+        ::operator delete(ptr);
+    }
+
+     void operator delete(void* ptr, size_t size) noexcept {
+        std::cout << "InternationalDrivingLicence::operator delete(size: " << size << ")" << std::endl;
+        ::operator delete(ptr);
+    }
+
+    operator IdentityDocument() const {
         return IdentityDocument(driving_licence_);
     }
 
-     operator DrivingLicence() const {
+    operator DrivingLicence() const {
         return driving_licence_;
     }
+
 private:
     DrivingLicence driving_licence_;
 };
