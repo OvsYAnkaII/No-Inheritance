@@ -39,8 +39,12 @@ public:
         delete DrivingLicenceObjectPtr;
     }
 
-     operator IdentityDocument() const {
+      operator IdentityDocument() const {
         return base_document_;
+    }
+
+    void Delete() {
+        DrivingLicenceDelete(this);
     }
 
     struct VTable {

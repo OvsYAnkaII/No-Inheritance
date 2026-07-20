@@ -63,4 +63,22 @@ int main() {
     cout << "Test5"sv << endl;
     Passport pass2;
     pass2.PrintUniqueIDCount();
+
+    cout << "Test6"sv << endl;
+    array<Passport, 4> docs3;
+
+    cout << "Test7"sv << endl;
+    InternationalDrivingLicence int_dr_lic;
+    PrintDrivingLicence(int_dr_lic);
+
+    cout << "Test8"sv << endl;
+    TravelPack* travel_pack1 = new TravelPack();
+    TravelPack* travel_pack2 = new TravelPack(*travel_pack1);
+    travel_pack1->PrintID();
+    travel_pack2->PrintID();
+    travel_pack1->Delete();
+    travel_pack2->PrintID();
+    travel_pack2->Delete();
+
+    cout << "Test9"sv << endl;
 }

@@ -48,6 +48,10 @@ public:
         void (*Delete)(void*);
     };
 
+    void Delete() {
+        DeleteTravelPack(this);
+    }
+
 private:
     IdentityDocument base_document{};
     IdentityDocument* identity_doc1_;

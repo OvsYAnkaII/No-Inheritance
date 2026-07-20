@@ -50,7 +50,7 @@ public:
         IdentityDocument::PrintUniqueIDCount();
     }
 
-    operator IdentityDocument() const {
+     operator IdentityDocument() const {
         return base_document_;
     }
 
@@ -58,6 +58,10 @@ public:
         void (*PrintID)(const void*);
         void (*Delete)(void*);
     };
+
+    void Delete() {
+        PassportDelete(this);
+    }
 
 private:
     IdentityDocument base_document_;

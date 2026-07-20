@@ -28,8 +28,12 @@ public:
         std::cout << std::endl;
     }
 
-     operator IdentityDocument() const {
+      operator IdentityDocument() const {
         return IdentityDocument(driving_licence_);
+    }
+
+     operator DrivingLicence() const {
+        return driving_licence_;
     }
 private:
     DrivingLicence driving_licence_;
